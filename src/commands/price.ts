@@ -9,6 +9,9 @@ import {
 import { PokemonTCGClient } from '../services/pokemonTCG.js';
 import { createCardEmbed, createSearchResultsEmbed, createErrorEmbed } from '../utils/embeds.js';
 
+// Configuration constants
+const SELECTION_TIMEOUT_MS = 60_000; // 60 seconds for user to select a card
+
 export const data = new SlashCommandBuilder()
   .setName('price')
   .setDescription('Search for a Pokémon card and get its price')
@@ -70,7 +73,7 @@ export async function execute(
     try {
       const collector = response.createMessageComponentCollector({
         componentType: ComponentType.StringSelect,
-        time: 60_000 // 60 seconds timeout
+        time: SELECTION_TIMEOUT_MS
       });
 
       collector.on('collect', async (selectInteraction) => {

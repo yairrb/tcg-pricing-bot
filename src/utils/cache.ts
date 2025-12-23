@@ -6,6 +6,7 @@ import { CacheEntry } from '../types/pokemon.js';
 export class TTLCache<T> {
   private cache: Map<string, CacheEntry<T>>;
   private defaultTTL: number;
+  private cleanupInterval?: NodeJS.Timeout;
 
   /**
    * @param defaultTTL - Default time-to-live in milliseconds
@@ -15,7 +16,7 @@ export class TTLCache<T> {
     this.defaultTTL = defaultTTL;
     
     // Clean up expired entries every minute
-    setInterval(() => this.cleanup(), 60 * 1000);
+    this.cleanupInterval = setInterval(() => this.cleanup(), 60 * 1000);
   }
 
   /**
@@ -78,5 +79,16 @@ export class TTLCache<T> {
       size: this.cache.size,
       keys: Array.from(this.cache.keys())
     };
+  }
+
+  /**
+   * Dispose of the cache and cleanup interval
+   */
+  dispose(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = undefined;
+    }
+    this.cache.clear();
   }
 }
